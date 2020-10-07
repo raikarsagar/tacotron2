@@ -1,3 +1,8 @@
+# Tacotron2 and Waveglow with ipex optimization
+
+refer helper_ipex.md
+
+
 # Tacotron 2 (without wavenet)
 
 PyTorch implementation of [Natural TTS Synthesis By Conditioning

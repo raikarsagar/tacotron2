@@ -16,6 +16,8 @@ from loss_function import Tacotron2Loss
 from logger import Tacotron2Logger
 from hparams import create_hparams
 
+use_cuda = torch.cuda.is_available()
+device = torch.device('cuda' if use_cuda else 'cpu')
 
 def reduce_tensor(tensor, n_gpus):
     rt = tensor.clone()
@@ -71,7 +73,8 @@ def prepare_directories_and_logger(output_directory, log_directory, rank):
 
 
 def load_model(hparams):
-    model = Tacotron2(hparams).cuda()
+    # model = Tacotron2(hparams).cuda()
+    model = Tacotron2(hparams).to(device)
     if hparams.fp16_run:
         model.decoder.attention_layer.score_mask_value = finfo('float16').min
 
@@ -80,6 +83,15 @@ def load_model(hparams):
 
     return model
 
+# def load_model(hparams):
+#     model = Tacotron2(hparams).cpu()
+#     if hparams.fp16_run:
+#         model.decoder.attention_layer.score_mask_value = finfo('float16').min
+
+#     if hparams.distributed_run:
+#         model = apply_gradient_allreduce(model)
+
+#     return model
 
 def warm_start_model(checkpoint_path, model, ignore_layers):
     assert os.path.isfile(checkpoint_path)
